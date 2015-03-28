@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>第三章 光线追踪器的基本要素 | Dayu&#39;s BLOG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="3.1 光线追踪计算的工作原理简化版的光线追踪器应能够处理下列操作：">
+<meta property="og:type" content="article">
+<meta property="og:title" content="第三章 光线追踪器的基本要素">
+<meta property="og:url" content="http://yuedayu.github.io/2015/03/29/光线追踪器的基本要素/index.html">
+<meta property="og:site_name" content="Dayu's BLOG">
+<meta property="og:description" content="3.1 光线追踪计算的工作原理简化版的光线追踪器应能够处理下列操作：">
+<meta property="og:image" content="http://chart.googleapis.com/chart?cht=tx&chl=\small (x_w,y_w,z_w)">
+<meta property="og:image" content="http://chart.googleapis.com/chart?cht=tx&chl=\small t=\frac{(a-o)n}{dn}">
+<meta property="og:image" content="http://chart.googleapis.com/chart?cht=tx&chl=\small (p-c)(p-c)-r^2=0">
+<meta property="og:image" content="http://chart.googleapis.com/chart?cht=tx&chl=\small (d\cdot d)t^2+[2(o-c)\cdot d]+(o-c)\cdot (o-c)-r^2=0">
+<meta property="og:image" content="http://chart.googleapis.com/chart?cht=tx&chl=\small c=(r,g,b), c_1=(r_1,g_1,b_1), c_2=(r_2,g_2,b_2)">
+<meta property="og:image" content="http://chart.googleapis.com/chart?cht=tx&chl=\small brightness=v^\gamma">
+<meta property="og:image" content="http://chart.googleapis.com/chart?cht=tx&chl=\small (r,g,b)(r^{1/ \gamma},g^{1/ \gamma},b^{1/ \gamma})">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="第三章 光线追踪器的基本要素">
+<meta name="twitter:description" content="3.1 光线追踪计算的工作原理简化版的光线追踪器应能够处理下列操作：">
+  
+  
+    <link rel="icon" href="/img/yuedy.jpg">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-58127646-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<div class="profilepic">
+			<a href="/"> <img src="/img/yuedy.jpg"></a>
+		</div>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Yue Dayu</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">唯有代码和妹子不可辜负嗯。。</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						<li>友情链接</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/YueDayu" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://www.renren.com/335788607/profile" title="weibo">weibo</a>
+					        
+								<a class="google" target="_blank" href="https://plus.google.com/+%E5%B2%B3%E5%A4%A7%E7%A6%B9/posts" title="google">google</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud">
+						<a href="/tags/光线追踪/" style="font-size: NaNpx;">光线追踪</a><a href="/tags/生活/" style="font-size: NaNpx;">生活</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://www.lab.mu/">Lab μ官方网站</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://blog.lab.mu/">Lab μ博客地址</a>
+			        
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					清华大学软件学院三字班，程序猿一只，技术不精，正在努力学习OwO
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay"></div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="/img/yuedy.jpg">
+			</div>
+
+			<hgroup>
+			  <h1 class="header-author"><a href="/">Yue Dayu</a></h1>
+			</hgroup>
+			
+			<p class="header-subtitle">唯有代码和妹子不可辜负嗯。。</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/YueDayu" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://www.renren.com/335788607/profile" title="weibo">weibo</a>
+			        
+						<a class="google" target="_blank" href="https://plus.google.com/+%E5%B2%B3%E5%A4%A7%E7%A6%B9/posts" title="google">google</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <article id="post-光线追踪器的基本要素" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/03/29/光线追踪器的基本要素/" class="article-date">
+  	<time datetime="2015-03-28T17:30:12.000Z" itemprop="datePublished">3月 29 2015</time>
+</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/光线追踪/">光线追踪</a></li></ul>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      第三章 光线追踪器的基本要素
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h2 id="3-1_光线追踪计算的工作原理">3.1 光线追踪计算的工作原理</h2><p>简化版的光线追踪器应能够处理下列操作：<br><a id="more"></a></p>
+<pre><code>定义多个对象；
+确定各个对象的材质；
+定义相应的光照；
+定义像素的窗口；
+<span class="function"><span class="title">for</span><span class="params">(各个像素)</span></span>
+    从像素中心向对象投射一束光线；
+    计算光线与对象之间的最近碰撞点（如果存在）；
+    <span class="function"><span class="title">if</span><span class="params">(光线与某一对象发生碰撞)</span></span>
+        通过对象的材质以及光照计算像素的颜色值；
+    <span class="keyword">else</span>
+        将像素的颜色值设定为黑色；
+</code></pre><p>在光线追踪计算中，光线可以穿透对象，即使该对象是不透明的。</p>
+<p>位于视平面上的像素将垂直于光线，称之为视平面像素。</p>
+<h2 id="3-2_场景世界">3.2 场景世界</h2><p>场景世界包含多个几何对象、光源、相机、视平面以及背景颜色。全部场景元素的位置和方向将使用<img src="http://chart.googleapis.com/chart?cht=tx&chl=\small (x_w,y_w,z_w)" style="border:none;">代表世界坐标或仅采用(x,y,z)。</p>
+<h2 id="3-3_光线">3.3 光线</h2><p>一条光线可看作是定义于某一源点<em>o</em>、方向为单位向量<em>d</em>的无限延伸的直线。另外，可通过参数<em>t</em>实现光线的参数化，且<em>t=0</em>处代表了光线的源点。因而，光线上的任一点<em>p</em>可表示为：p=o+td。</p>
+<p>光源以及方向在执行光线-对象间的相交计算前，通常定义于世界坐标系统中。</p>
+<p>在光线追踪计算中，一般采用下列光线类型</p>
+<ul>
+<li>主光线，始于各像素中心位置，并位于透视投影中的相机处；</li>
+<li>次级光线，一般为反射光线，且始于对象表面处；</li>
+<li>阴影光线，主要用于着色且源于对象表面某处；</li>
+<li>光照光线，来自于相应的光源并用于模仿全局光照。</li>
+</ul>
+<p>在本章中主要讨论主光线。</p>
+<p>Ray.h代码如下：</p>
+<pre><code><span class="preprocessor">#ifndef __RAY__</span>
+<span class="preprocessor">#<span class="keyword">define</span> __RAY__</span>
+
+<span class="preprocessor">#<span class="keyword">include</span> "Point3D.h"</span>
+<span class="preprocessor">#<span class="keyword">include</span> "Vector3D.h"</span>
+
+<span class="keyword">class</span> Ray
+{
+<span class="keyword">public</span>:
+    Point3D o;
+    Vector3D d;
+    Ray(<span class="keyword">void</span>);
+    Ray(<span class="keyword">const</span> Point3D&amp; origin, <span class="keyword">const</span> Vector3D&amp; dir);
+    Ray(<span class="keyword">const</span> Ray&amp; ray);
+
+    Ray&amp; <span class="keyword">operator</span> = (<span class="keyword">const</span> Ray&amp; rhs);
+    ~Ray(<span class="keyword">void</span>);
+};
+</code></pre><h2 id="3-4_光线-对象相交测试">3.4 光线-对象相交测试</h2><h3 id="3-4-1_概述">3.4.1 概述</h3><p>将在区间[x, INF]内计算最小t值。其中x为一个较小的证书，例如t=10^-6^以保证在后续章节中计算结果的正确性。</p>
+<h3 id="3-4-2_光线和隐式表面">3.4.2 光线和隐式表面</h3><pre><code>隐式表面定义：<span class="function"><span class="title">f</span><span class="params">(x,y,z)</span></span>=<span class="number">0</span>
+</code></pre><p>采用f(<em>o+td</em>)=0来计算碰撞点。</p>
+<h3 id="3-4-3_几何对象">3.4.3 几何对象</h3><p>全部几何对象均继承自基类GrametricObject。在本章中奖使用某些简化的数据结构，包括GrametricObject类、Plane类以及Sphere类。</p>
+<p>GrametricObject类中的部分声明如下，其中包含了RGBColor，之后会用材质指针来代替RGBColor字段。</p>
+<pre><code><span class="keyword">class</span> <span class="title">GrametricObject</span>
+{
+<span class="keyword">public</span>:
+    ...
+    <span class="function"><span class="keyword">virtual</span> <span class="keyword">bool</span> <span class="title">hit</span><span class="params">(<span class="keyword">const</span> Ray&amp; ray, <span class="keyword">double</span>&amp; tmin, ShadeRec&amp; sr)</span> <span class="keyword">const</span> </span>= <span class="number">0</span>;
+<span class="keyword">protected</span>:
+    RGBColor color;
+};
+</code></pre><p>hit()函数参数列表中的ShadeRec对象充当一个工具类，用以储存光线追踪器所需的全部信息，并对光线-对象间的碰撞点进行着色。着色将会计算反射光线的颜色值。ShadeRec类代码如下：</p>
+<pre><code><span class="class"><span class="keyword">class</span> <span class="title">ShadeRec</span>
+</span>{
+<span class="keyword">public</span>:
+    bool hit_an_object;             <span class="comment">//did the ray hit an object?</span>
+    Point3D local_hit_point;        <span class="comment">//world coordinates of hit point</span>
+    Normal normal;                  <span class="comment">//normal at hit point</span>
+    RGBColor color;                 <span class="comment">//used in Chapter 3 only</span>
+    World&amp; d;                       <span class="comment">//worle reference for shading</span>
+
+    ShadeRec(World&amp; wr);            <span class="comment">//constructor</span>
+    ShadeRec(<span class="keyword">const</span> ShadeRec&amp; sr)    <span class="comment">//copy constructor</span>
+    ~ShadeRec(<span class="keyword">void</span>);                <span class="comment">//destructor</span>
+
+    ShadeRec&amp; operator = (<span class="keyword">const</span> ShadeRec&amp; rhs);
+                                    <span class="comment">//assignment operator</span>
+};
+
+ShadeRec::ShadeRec(World&amp; wr) : hit_an_object(<span class="keyword">false</span>),
+                                local_hit_point(),
+                                normal(),
+                                color(black),
+                                w(wr)
+{}
+</code></pre><h3 id="3-4-4_平面">3.4.4 平面</h3><pre><code>平面的方程为：(p-a)<span class="keyword">n</span>=0，<span class="keyword">n</span>为法向量。
+</code></pre><p>将(o+td)代入得，<img src="http://chart.googleapis.com/chart?cht=tx&chl=\small t=\frac{(a-o)n}{dn}" style="border:none;">。计算得到t值并可得到碰撞点坐标（更加高效）。</p>
+<p>Plane类储存了顶点和发现数据。代码如下：</p>
+<pre><code>class Plane : <span class="keyword">public</span> GeomerricObject
+{
+<span class="keyword">public</span>:
+    Plane(<span class="keyword">void</span>);
+    Plane(<span class="keyword">const</span> Point3D p, <span class="keyword">const</span> Normal&amp; n);
+    ...
+    virtual bool hit(<span class="keyword">const</span> Ray&amp; ray, <span class="keyword">double</span>&amp; t, ShadeRec&amp; s) <span class="keyword">const</span>;
+<span class="keyword">private</span>:
+    Point3D <span class="built_in">point</span>;                    <span class="comment">//point through which plane passes</span>
+    Normal <span class="built_in">normal</span>;                    <span class="comment">//normal to the plane</span>
+    <span class="keyword">static</span> <span class="keyword">const</span> <span class="keyword">double</span> kEpsilon;     <span class="comment">//see Chapter 16</span>
+}
+
+bool Plane::hit(<span class="keyword">const</span> Ray&amp; ray, <span class="keyword">double</span>&amp; t, ShadeRec&amp; s) <span class="keyword">const</span>
+{
+    <span class="keyword">double</span> t = (<span class="built_in">point</span> - ray.o) * <span class="built_in">normal</span> / (ray.d * <span class="built_in">normal</span>);
+    <span class="keyword">if</span> (t &gt; kEpsilon)
+    {
+        tmin = t;
+        sr.<span class="built_in">normal</span> = <span class="built_in">normal</span>;
+        sr.local_hit_point = ray.o + t * ray.d;
+        <span class="keyword">return</span> <span class="keyword">true</span>;
+    }
+    <span class="keyword">else</span>
+    {
+        <span class="keyword">return</span> <span class="keyword">false</span>;
+    }
+}
+</code></pre><p>该碰撞函数仅为一个简单的测试版本，碰撞测试一般都较为复杂。</p>
+<h3 id="3-4-5_球体">3.4.5 球体</h3><p>球体方程可以改写为<img src="http://chart.googleapis.com/chart?cht=tx&chl=\small (p-c)(p-c)-r^2=0" style="border:none;">。</p>
+<p>代入得<img src="http://chart.googleapis.com/chart?cht=tx&chl=\small (d\cdot d)t^2+[2(o-c)\cdot d]+(o-c)\cdot (o-c)-r^2=0" style="border:none;">。</p>
+<p>相当于解一个一元二次方程。</p>
+<p>代码如下，并没有对d=0时的相切状态加以测试。</p>
+<pre><code><span class="keyword">bool</span> Sphere::hit(<span class="keyword">const</span> Ray&amp; ray, <span class="keyword">double</span>&amp; tmin, ShadeRec&amp; sr) <span class="keyword">const</span>
+{
+    <span class="keyword">double</span> t;
+    Vector3D temp = ray.o - center;
+    <span class="keyword">double</span> a = ray.d * ray.d;
+    <span class="keyword">double</span> b = <span class="number">2.0</span> * temp * ray.d;
+    <span class="keyword">double</span> c = temp * temp - radius * radius;
+    <span class="keyword">double</span> disc = b * b - <span class="number">4.0</span> * a * c;
+    <span class="keyword">if</span> (disc &lt; <span class="number">0.0</span>)
+    {
+        <span class="keyword">return</span> <span class="keyword">false</span>;
+    }
+    <span class="keyword">else</span>
+    {
+        <span class="keyword">double</span> e = <span class="built_in">sqrt</span>(disc);
+        <span class="keyword">double</span> denom = <span class="number">2.0</span> * a;
+        t = (-b - c) / denom;
+        <span class="keyword">if</span> (t &gt; kEpsilon)
+        {
+            tmin = t;
+            sr.normal = (temp + t * ray.d) / radius;
+            sr.local_hit_point = ray.o + t * ray.d;
+            <span class="keyword">return</span> <span class="keyword">true</span>;
+        }
+        t = (-b + c) / denom;
+        <span class="keyword">if</span> (t &gt; kEpsilon)
+        {
+            tmin = t;
+            sr.normal = (temp + t * ray.d) / radius;
+            sr.local_hit_point = ray.o + t * ray.d;
+            <span class="keyword">return</span> <span class="keyword">true</span>;
+        }
+        <span class="keyword">return</span> <span class="keyword">false</span>;
+    }
+}
+</code></pre><h2 id="3-5_颜色值">3.5 颜色值</h2><p>另<br><img src="http://chart.googleapis.com/chart?cht=tx&chl=\small c=(r,g,b), c_1=(r_1,g_1,b_1), c_2=(r_2,g_2,b_2)" style="border:none;"><br>a和p为两个浮点数。相关计算包括：</p>
+<table>
+<thead>
+<tr>
+<th>操作</th>
+<th>定义</th>
+<th>返回类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>c1 + c2</td>
+<td>(r1 + r2, g1 + g2, b1 + b2)</td>
+<td>RBG color</td>
+</tr>
+<tr>
+<td>ac</td>
+<td>(ar, ag, ab)</td>
+<td>RBG color</td>
+</tr>
+<tr>
+<td>ca</td>
+<td>(ar, ag, ab)</td>
+<td>RBG color</td>
+</tr>
+<tr>
+<td>c / a</td>
+<td>(r / a, g / a, b / a)</td>
+<td>RBG color</td>
+</tr>
+<tr>
+<td>c1 = c2</td>
+<td>(r1 = r2, g1 = g2, b1 = b2)</td>
+<td>RBG color reference</td>
+</tr>
+<tr>
+<td>c1*c2</td>
+<td>(r1r2, g1g2, b1b2)</td>
+<td>RBG color</td>
+</tr>
+<tr>
+<td>c^p</td>
+<td>(r^p,g^p,b^p)</td>
+<td>RBG color</td>
+</tr>
+<tr>
+<td>c1 += c2</td>
+<td>(r1 += r2, g1 += g2, b1 += b2)</td>
+<td>RBG color reference</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-6_基本的光线追踪器">3.6 基本的光线追踪器</h2><h3 id="3-6-1_工作类">3.6.1 工作类</h3><p>需要12个工作类，如下所示：</p>
+<table>
+<thead>
+<tr>
+<th>几何对象</th>
+<th>跟踪器</th>
+<th>工具类</th>
+<th>场景</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GeometricObject</td>
+<td>Tracer</td>
+<td>Normal</td>
+<td>ViewPlane</td>
+</tr>
+<tr>
+<td>Sphere</td>
+<td>SingleSphere</td>
+<td>Point3D</td>
+<td>World</td>
+</tr>
+<tr>
+<td>-</td>
+<td>-</td>
+<td>Ray</td>
+<td>-</td>
+</tr>
+<tr>
+<td>-</td>
+<td>-</td>
+<td>RGBColor</td>
+<td>-</td>
+</tr>
+<tr>
+<td>-</td>
+<td>-</td>
+<td>ShadeRec</td>
+<td>-</td>
+</tr>
+<tr>
+<td>-</td>
+<td>-</td>
+<td>Vector3D</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
+<p>在目前阶段，World类、ViewPlane类、ShadeRec类以及GeometricObject类仅采用简化版本。</p>
+<p>World类内容见P52。</p>
+<h3 id="3-6-3_主函数">3.6.3 主函数</h3><pre><code><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span>
+</span>{
+    World w;
+    w.build();
+    w.render_scene();
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+</code></pre><h3 id="3-6-3_视平面">3.6.3 视平面</h3><p>ViewPlane类储存了水平、垂直方向上的全部像素以及像素尺寸。</p>
+<pre><code><span class="keyword">class</span> <span class="title">ViewPlane</span>
+{
+<span class="keyword">public</span>:
+    <span class="keyword">int</span> hres;                    <span class="comment">//horizontal image resolution</span>
+    <span class="keyword">int</span> vres;                    <span class="comment">//vertical image resolution</span>
+    <span class="keyword">float</span> s;                     <span class="comment">//pixel size</span>
+    <span class="keyword">float</span> gamma;                 <span class="comment">//monitor gamma factor</span>
+    <span class="keyword">float</span> inv_gamma;             <span class="comment">//one over gamma</span>
+    ...
+}
+</code></pre><p>光线均始于各像素点的中心。z~w~坐标用于确定黄线的源点且各光线源点的z~w~均相同。</p>
+<h3 id="3-6-4_像素和图像">3.6.4 像素和图像</h3><p>在一般的观察条件下，通过渲染窗口获得的可见场景常称为视域。</p>
+<p>视域取决于水平方向和垂直方向上的像素数量及其尺寸。同时，它们还定义了光线源点以及场景采样点的位置。</p>
+<h3 id="3-6-5_build()函数">3.6.5 build()函数</h3><p>build()函数如下：</p>
+<pre><code><span class="keyword">void</span> World::build(<span class="keyword">void</span>)
+{
+    vp.set_hers(<span class="number">200</span>);
+    vp.set_vres(<span class="number">200</span>);
+    vp.set_pixel_size(<span class="number">1.0</span>);
+    vp.set_gamma(<span class="number">1.0</span>);
+    background_color = black;
+    tracer_ptr = <span class="keyword">new</span> SingleSphere(<span class="keyword">this</span>);
+    <span class="built_in">sphere</span>.set_center(<span class="number">0.0</span>);
+    <span class="built_in">sphere</span>.set_radius(<span class="number">85.0</span>);
+}
+</code></pre><h3 id="3-6-6_渲染场景">3.6.6 渲染场景</h3><p>函数World::render_scene()负责渲染场景。代码见P57。</p>
+<h2 id="3-7_跟踪器">3.7 跟踪器</h2><p>跟踪函数如下：</p>
+<pre><code>RGBColor SingleSphere::trace_ray(<span class="keyword">const</span> Ray&amp; ray) <span class="keyword">const</span>
+{
+    <span class="function">ShadeRec <span class="title">sr</span><span class="params">(*world_ptr)</span></span>;
+    <span class="keyword">double</span> t;
+    <span class="keyword">if</span> (world_ptr-&gt;sphere.hit(ray, t, sr))
+    {
+        <span class="keyword">return</span> red;
+    }
+    <span class="keyword">else</span>
+    {
+        <span class="keyword">return</span> black;
+    }
+}
+</code></pre><h2 id="3-8_颜色显示">3.8 颜色显示</h2><p>display_pixel()函数将各个像素的颜色值转化为显示器可以支持的颜色，这个过程设计到3个步骤：</p>
+<ul>
+<li>色调映射</li>
+<li>gamma值修正</li>
+<li>整数映射</li>
+</ul>
+<p>显示器的亮度值通常与工作电压呈线性关系，因而gamma值修正是必要的。一般有<img src="http://chart.googleapis.com/chart?cht=tx&chl=\small brightness=v^\gamma" style="border:none;">。其中$v$表示工作电压，$\gamma$表示当前显示器的gamma值。修正之后的表达式为：<img src="http://chart.googleapis.com/chart?cht=tx&chl=\small (r,g,b)(r^{1/ \gamma},g^{1/ \gamma},b^{1/ \gamma})" style="border:none;">。</p>
+<h2 id="3-9_对多个物体实施光线追踪">3.9 对多个物体实施光线追踪</h2><p>此时要在World类中添加多个物体，并返回最小值的颜色值进行绘制。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2015/01/01/Hello,2015/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Hello,2015</div>
+      <strong class="article-nav-caption">&gt;</strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="光线追踪器的基本要素" data-title="第三章 光线追踪器的基本要素" data-url="http://yuedayu.github.io/2015/03/29/光线追踪器的基本要素/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"yuedayu"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 Yue Dayu
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+  <script src="/js/main.js" type="text/javascript"></script>
+
+  </div>
+</body>
+</html>
