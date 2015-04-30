@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Smali语法 | Dayu&#39;s BLOG</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Dalvik字节码有两种类型：原始类型；引用类型（包括对象和数组）。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Smali语法">
+<meta property="og:url" content="http://yuedayu.github.io/2015/04/30/Smali语法/index.html">
+<meta property="og:site_name" content="Dayu's BLOG">
+<meta property="og:description" content="Dalvik字节码有两种类型：原始类型；引用类型（包括对象和数组）。">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Smali语法">
+<meta name="twitter:description" content="Dalvik字节码有两种类型：原始类型；引用类型（包括对象和数组）。">
+  
+  
+    <link rel="icon" href="/img/yuedy.jpg">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+  
+<!-- Google Analytics -->
+<script type="text/javascript">
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-58127646-1', 'auto');
+ga('send', 'pageview');
+
+</script>
+<!-- End Google Analytics -->
+
+
+  <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<div class="profilepic">
+			<a href="/"> <img src="/img/yuedy.jpg"></a>
+		</div>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">Yue Dayu</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">唯有代码和妹子不可辜负嗯。。</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						<li>友情链接</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/YueDayu" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://www.renren.com/335788607/profile" title="weibo">weibo</a>
+					        
+								<a class="google" target="_blank" href="https://plus.google.com/+%E5%B2%B3%E5%A4%A7%E7%A6%B9/posts" title="google">google</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud">
+						<a href="/tags/光线追踪/" style="font-size: NaNpx;">光线追踪</a><a href="/tags/学习/" style="font-size: NaNpx;">学习</a><a href="/tags/生活/" style="font-size: NaNpx;">生活</a><a href="/tags/生活技能/" style="font-size: NaNpx;">生活技能</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://www.lab.mu/">Lab μ官方网站</a>
+			        
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://blog.lab.mu/">Lab μ博客地址</a>
+			        
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					清华大学软件学院三字班，程序猿一只，技术不精，正在努力学习OwO
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay"></div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img src="/img/yuedy.jpg">
+			</div>
+
+			<hgroup>
+			  <h1 class="header-author"><a href="/">Yue Dayu</a></h1>
+			</hgroup>
+			
+			<p class="header-subtitle">唯有代码和妹子不可辜负嗯。。</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/YueDayu" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://www.renren.com/335788607/profile" title="weibo">weibo</a>
+			        
+						<a class="google" target="_blank" href="https://plus.google.com/+%E5%B2%B3%E5%A4%A7%E7%A6%B9/posts" title="google">google</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <article id="post-Smali语法" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/04/30/Smali语法/" class="article-date">
+  	<time datetime="2015-04-30T10:51:08.000Z" itemprop="datePublished">4月 30 2015</time>
+</a>
+      
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/学习/">学习</a></li></ul>
+
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Smali语法
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p>Dalvik字节码有两种类型：原始类型；引用类型（包括对象和数组）。</p>
+<a id="more"></a>
+<h3 id="原始类型：">原始类型：</h3><ul>
+<li>V void 只能用于返回值类型</li>
+<li>Z boolean</li>
+<li>B byte</li>
+<li>S short</li>
+<li>C char</li>
+<li>I int</li>
+<li>J long（64位）</li>
+<li>F float</li>
+<li>D double（64位）</li>
+</ul>
+<h3 id="对象类型：">对象类型：</h3><p>表示方法：<code>Lpackage/name/ObjectName;</code></p>
+<p>相当于java中的<code>package.name.ObjectName;</code></p>
+<p>解释如下：</p>
+<ul>
+<li>L 表示这是一个对象类型</li>
+<li>package/name 该对象所在的包</li>
+<li>; 表示对象名称的结束</li>
+</ul>
+<h3 id="数组">数组</h3><p>表示形式：</p>
+<ul>
+<li><code>[I</code>表示一个整形的一维数组，相当于java的<code>int[]</code>;</li>
+<li>对于多维数组，只要增加[就行了，<code>[[I</code> = <code>int[][]</code>;</li>
+<li>每一维最多255个。</li>
+</ul>
+<h3 id="方法">方法</h3><p>表示形式: <code>Lpackage/name/ObjectName;——&gt;methodName(III)Z</code></p>
+<p>详解如下：</p>
+<ul>
+<li><code>Lpackage/name/ObjectName</code>表示类型</li>
+<li><code>methodName</code>表示方法名</li>
+<li><code>III</code>表示参数（这里表示为3个整型参数）</li>
+</ul>
+<p>说明：方法的参数是一个接一个的，中间没有隔开；</p>
+<p>一个更复杂的例子：</p>
+<p><code>method(I[[IILjava/lang/String;[Ljava/lang/Object;)Ljava/lang/String;</code></p>
+<p>在java中则为：</p>
+<p><code>String method(int, int\[][], int, String, Object[])</code></p>
+<h3 id="字段">字段</h3><p>表示形式：</p>
+<p><code>Lpackage/name/ObjectName;-&gt;FieldName:Ljava/lang/String;</code></p>
+<p>即包名，字段名和各字段类型。</p>
+<h3 id="寄存器">寄存器</h3><p>在dalvik字节码中，寄存器都是32位的，能够支持任何类型。64位类型（Long和Double型）用2个寄存器表示。</p>
+<p>有两种方式指定一个方法中有多少寄存器是可用的。<code>.registers</code>指令指定了方法中寄存器的总数。<code>.locals</code>指令表明了方法中非参寄存器的数量。</p>
+<h3 id="方法的传参">方法的传参</h3><p>当一个方法被调用的时候，方法的参数被置于最后N个寄存器中。如果一个方法有2个参数，5个寄存器（v0-v4），那么参数将置于最后2个寄存器——v3和v4。</p>
+<p>非静态方法中的第一个参数总是调用该方法的对象。</p>
+<p>例如，非静态方法<code>LMyObject;-&gt;callMe(II)V</code>有2个整型参数，另外还有一个隐含的<code>LMyObject;</code>参数，所以总共有3个参数。假如在该方法中指定了5个寄存器（v0-v4），以<code>.registers</code>方式指定5个或以<code>.locals</code>方式指定2个（即2个local寄存器+3个参数寄存器）。当该方法被调用的时候，调用该方法的对象（即<code>this</code>引用）存放在v2中，第一个整型参数存放在v3中，第二个整型参数存放在v4中。</p>
+<p>对于静态方法除了没有隐含的<code>this</code>参数外其它都一样。</p>
+<h3 id="寄存器的命名方式">寄存器的命名方式</h3><p>有两种方式——V命名方式和P命名方式。P命名方式中的第一个寄存器就是方法中的第一个参数寄存器。在下表中我们用这两种命名方式来表示上一个例子中有5个寄存器和3个参数的方法。</p>
+<pre><code>v0      第一个local <span class="keyword">register</span>
+v1      第二个local <span class="keyword">register</span>
+v2  p0  第一个parameter <span class="keyword">register</span>
+v3  p1  第二个parameter <span class="keyword">register</span>
+v4  p2  第三个parameter <span class="keyword">register</span>
+</code></pre><p>你可以用任何一种方式来引用参数寄存器——他们没有任何差别。</p>
+<p>注意：baksmali默认对参数寄存器使用P命名方式。如果想使用V命名方式，可以使用<code>-pl—no-parameter-registers</code>选项。</p>
+<p>使用P命名方式是为了防止以后如果要在方法中增加寄存器，需要对参数寄存器重新进行编号的缺点。</p>
+<h3 id="Long/Double值">Long/Double值</h3><p>Long和double类型是64位的，需要2个寄存器（切记切记）。</p>
+<p>例如，对于非静态方法<code>LMyObject;-&gt;MyMethod(IJZ)V</code>，参数分别是<code>LMyObject;</code>，<code>int</code>，<code>long</code>，<code>bool</code>。故该方法需要5个寄存器来存储参数。</p>
+<pre><code>p0  this
+p1  <span class="literal">I</span>
+p2, p3  <span class="literal">J</span>
+p4  Z
+</code></pre><h3 id="补充">补充</h3><pre><code><span class="preprocessor"># static fields             定义静态变量的标记</span>
+<span class="preprocessor"># instance fields        定义实例变量的标记</span>
+<span class="preprocessor"># direct methods       定义静态方法的标记</span>
+<span class="preprocessor"># virtual methods      定义非静态方法的标记</span>
+</code></pre><p>构造函数的返回类型为V，名字为<code>&lt;init&gt;</code>。</p>
+<p><code>if-eq p1, v0, :cond_8</code>表示如果p1和v0相等，则执行cond_8的流程：</p>
+<pre><code>:cond_8<span class="instruction">
+invoke-direct </span>{<span class="variable">p0</span>}, <span class="class">Lcom/paul/test/a;</span><span class="function">-&gt;d(</span><span class="function">)</span>V
+</code></pre><p>调用com.paul.test.a的d()方法</p>
+<p><code>if-ne p1, v0, :cond_b</code>表示不相等则执行cond_b的流程：</p>
+<pre><code>:cond_b<span class="instruction">
+const/4 </span><span class="variable">v0</span>, 0x0<span class="instruction">
+invoke-virtual </span>{<span class="variable">p0</span>, <span class="variable">v0</span>}, <span class="class">Lcom/paul/test/a;</span><span class="function">-&gt;setPressed(</span>Z<span class="function">)</span>V<span class="instruction">
+invoke-super </span>{<span class="variable">p0</span>, <span class="variable">p1</span>, <span class="variable">p2</span>}, <span class="class">Landroid/view/View;</span><span class="function">-&gt;onKeyUp(</span>I<span class="class">Landroid/view/KeyEvent;</span><span class="function">)</span>Z<span class="instruction">
+move-result </span><span class="variable">v0</span>
+</code></pre><p>大概意思就是调用<code>com.paul.test.a</code>的<code>setPressed</code>方法，然后再调用父类<code>View</code>的<code>onKeyUp</code>方法，最后<code>return v0</code></p>
+<h3 id="参考">参考</h3><p><a href="http://pallergabor.uw.hu/androidblog/dalvik_opcodes.html" target="_blank" rel="external">点这里</a>查看所有指令。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+      
+    </footer>
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2015/04/05/如何用20G过完一个月/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">如何用20G过完一个月</div>
+      <strong class="article-nav-caption">&gt;</strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="Smali语法" data-title="Smali语法" data-url="http://yuedayu.github.io/2015/04/30/Smali语法/"></div>
+<!-- 多说评论框 end -->
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"yuedayu"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 Yue Dayu
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+  <script src="/fancybox/jquery.fancybox.pack.js" type="text/javascript"></script>
+  <script src="/js/main.js" type="text/javascript"></script>
+
+  </div>
+</body>
+</html>
